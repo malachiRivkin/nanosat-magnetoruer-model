@@ -39,18 +39,27 @@ tspan = [0,period*n_orbits] #period over which to integrate ode
 
 
 #integrate numerically
-#test Satellite function
-#testOutput = Satellite(0, state0)
-#print(testOutput)
-
-
 propagation = sci.integrate.solve_ivp(Satellite, tspan, state0, method='RK45', max_step=100)
 tout = propagation.t
 sol_out = propagation.y
+#print(foo)
+
+#loop through output to extract B field components
+BIout = []#np.zeros(length(tout)); #create an empty array
+#ByIout = BxIout;
+#BzIout = BxIout;
+for i,t in enumerate(tout):
+    out = Satellite(t,sol_out[:,i])
+    #BIout = BIout.append(foo)
+    #print(foo)
+    
+
 print("Simulation Complete")
 print("T out max: ", max(tout))
 
 
+
+"""
 ############Plot Results################3
 #(might want to consider moving all of this to a separate function/script/class//etc)
 #extract states
@@ -83,3 +92,4 @@ qw = qu
 ax.quiver(qu,qv,qw,qx,qy,qz, color='black')
 
 plt.show()
+"""
