@@ -9,22 +9,22 @@ from satellite import *
 from earth import *
 
 #params
-n_orbits = 3
+n_orbits = 1
 
 #initial conditions
-t0 = 0  #ignore for now, will eventually need to incorporate julian time
+#t0 = 0  #ignore for now, will eventually need to incorporate julian time
 altitude = 550e3    #m AGL
-inclination = 0    #degrees
+inclination = 98    #degrees
 """ start with circular orbit for now, will consider eccentric orbits in future...
 RAAN = 0    #ignore for now
 i = 0   #ignore for now
 """
-a = altitude
+a = altitude + R
 vcircular = np.sqrt(MU/a)
 inclination = np.deg2rad(inclination)
 
 #initial state (summary of above)
-x0 = R + a  #we'll start at apoapsis, at 0 lat/0 long
+x0 = a  #we'll start at apoapsis, at 0 lat/0 long
 y0 = 0
 z0 = 0
 xdot0 = 0
@@ -44,23 +44,42 @@ tspan = [0,period*n_orbits] #period over which to integrate ode
 #print(testOutput)
 
 
-propagation = sci.integrate.solve_ivp(Satellite, tspan, state0)#, maxstep=60)
+propagation = sci.integrate.solve_ivp(Satellite, tspan, state0, method='RK45', max_step=100)
 tout = propagation.t
 sol_out = propagation.y
 print("Simulation Complete")
+print("T out max: ", max(tout))
 
 
 ############Plot Results################3
 #(might want to consider moving all of this to a separate function/script/class//etc)
 #extract states
-xout = sol_out[0]/1000
-yout = sol_out[1]/1000
-zout = sol_out[2]/1000
+xout = sol_out[0,:]/1000
+yout = sol_out[1,:]/1000
+zout = sol_out[2,:]/1000
 
 #housekeeping
 #fig, axes = plt.subplots(1,3)
 
 #plot orbit in 3d
-#plt.scatter(xout, yout, zout)
-plt.plot(xout,yout)
+#plt earth
+u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
+x = R*np.cos(u) * np.sin(v)
+y = R*np.sin(u) * np.sin(v)
+z = R*np.cos(v)
+
+#plot orbit
+ax = plt.axes(projection='3d')
+ax.plot_surface(x/1000, y/1000, z/1000, cmap=plt.cm.YlGnBu_r, alpha=.5)
+ax.scatter3D(xout, yout, zout)
+
+#plot arrows
+qx = [0,10000,0]
+qy = [0,0,0]
+qz = [10000,0,-10000]
+qu = [0,0,0]
+qv = qu
+qw = qu
+ax.quiver(qu,qv,qw,qx,qy,qz, color='black')
+
 plt.show()

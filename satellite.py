@@ -9,7 +9,7 @@ def Satellite(t, state):
     # second three elements = 1st time derivative of position
 
     #mass properties
-    m = 6   #kg - satellite mass
+    m = 2   #kg - satellite mass
     """
     Ix = 1
     Iy = 1
@@ -24,13 +24,13 @@ def Satellite(t, state):
     r = position
     rnorm = np.linalg.norm(r)
     rhat = r/rnorm
-    Fg = -(G*M*m/rnorm) * rhat
+    Fg = -(G*M*m/rnorm**2) * rhat
     
 
     #translational dynamics
     #Fexternal = 0   #this would become a vector if thrust, solar pressure, etc are assumed to act on body
     F = Fg #+ Fexternal
-    acceleration = F/M
+    acceleration = F/m
 
     #state derivatives
     dstatedt = [*velocity, *acceleration]
